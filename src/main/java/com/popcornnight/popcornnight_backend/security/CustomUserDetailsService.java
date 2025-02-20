@@ -1,5 +1,7 @@
 package com.popcornnight.popcornnight_backend.security;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,9 +10,7 @@ import org.springframework.stereotype.Service;
 import com.popcornnight.popcornnight_backend.entity.User;
 import com.popcornnight.popcornnight_backend.repository.UserRepository;
 
-import java.util.Optional;
-
-@Service // ✅ Mark this as a Spring-managed bean
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

@@ -36,7 +36,6 @@ public class AuthenticationController {
     }
 }
 
-// DTO classes for login
 class LoginRequest {
     private String username;
     private String password;
