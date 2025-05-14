@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.popcornnight.popcornnight_backend.dto.MovieRequest;
-import com.popcornnight.popcornnight_backend.dto.MovieResponse;
+import com.popcornnight.popcornnight_backend.dto.movie.MovieRequest;
+import com.popcornnight.popcornnight_backend.dto.movie.MovieResponse;
 import com.popcornnight.popcornnight_backend.service.MovieService;
 
 @RestController

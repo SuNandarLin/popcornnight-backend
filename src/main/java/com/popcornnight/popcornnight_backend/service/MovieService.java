@@ -1,9 +1,9 @@
 package com.popcornnight.popcornnight_backend.service;
 
-import com.popcornnight.popcornnight_backend.dto.MovieRequest;
-import com.popcornnight.popcornnight_backend.dto.MovieResponse;
-
 import java.util.List;
+
+import com.popcornnight.popcornnight_backend.dto.movie.MovieRequest;
+import com.popcornnight.popcornnight_backend.dto.movie.MovieResponse;
 
 public interface MovieService {
 

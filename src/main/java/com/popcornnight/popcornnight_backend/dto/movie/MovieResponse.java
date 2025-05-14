@@ -1,4 +1,6 @@
-package com.popcornnight.popcornnight_backend.dto;
+package com.popcornnight.popcornnight_backend.dto.movie;
+
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,14 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieRequest {
+public class MovieResponse {
+    private long id;
     private String title;
     private String description;
     private Date releaseDate;

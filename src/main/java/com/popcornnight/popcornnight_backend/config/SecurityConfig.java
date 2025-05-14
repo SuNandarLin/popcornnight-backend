@@ -36,8 +36,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Public access to authentication endpoints
-                        .requestMatchers("/api/movies/**").permitAll() // Public movie endpoints
-                        .requestMatchers("/api/users/**").hasRole("ADMIN") // Admin only
+                        .requestMatchers("/api/users/**").permitAll() // Public movie endpoints
+                        .requestMatchers("/api/movies/**").hasRole("ADMIN") // Admin only
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);

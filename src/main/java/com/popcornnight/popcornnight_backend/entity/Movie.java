@@ -9,6 +9,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -34,4 +35,8 @@ public class Movie {
 
     @Column(name = "duration")
     private int duration;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.MERGE)
+    private Set<ShowTime> showTimes;
+
 }

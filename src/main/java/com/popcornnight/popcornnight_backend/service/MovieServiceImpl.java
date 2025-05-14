@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.popcornnight.popcornnight_backend.dto.MovieRequest;
-import com.popcornnight.popcornnight_backend.dto.MovieResponse;
+import com.popcornnight.popcornnight_backend.dto.movie.MovieRequest;
+import com.popcornnight.popcornnight_backend.dto.movie.MovieResponse;
 import com.popcornnight.popcornnight_backend.entity.Movie;
 import com.popcornnight.popcornnight_backend.repository.MovieRepository;
 

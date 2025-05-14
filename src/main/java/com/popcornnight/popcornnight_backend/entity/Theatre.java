@@ -16,31 +16,22 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "theatres")
+public class Theatre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "is_anonymous")
-    private Boolean isAnonymous;
-
     @Column(name = "name")
     private String name;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "branch")
+    private String branch;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "location")
+    private String location;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "role")
-    private String role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
-    private Set<Ticket> tickets;
+    @OneToMany(mappedBy = "theatre", cascade = CascadeType.MERGE)
+    private Set<Hall> halls;
 }
