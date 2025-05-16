@@ -1,17 +1,18 @@
 package com.popcornnight.popcornnight_backend.service;
 
-import com.popcornnight.popcornnight_backend.entity.Theatre;
+import com.popcornnight.popcornnight_backend.dto.theatre.TheatreRequest;
+import com.popcornnight.popcornnight_backend.dto.theatre.TheatreResponse;
 
 import java.util.List;
 
 public interface TheatreService {
-    List<Theatre> getAllTheatres();
+    List<TheatreResponse> getAllTheatres();
 
-    Theatre getTheatreById(Long theatreId);
+    TheatreResponse getTheatreById(Long theatreId);
 
-    Theatre createTheatre(Theatre theatre);
+    TheatreResponse createTheatre(TheatreRequest theatreRequest);
 
-    Theatre updateTheatre(Long theatreId, Theatre theatre);
+    TheatreResponse updateTheatre(Long theatreId, TheatreRequest theatreRequest);
 
     void deleteTheatre(Long theatreId);
 }

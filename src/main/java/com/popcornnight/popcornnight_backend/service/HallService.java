@@ -1,17 +1,18 @@
 package com.popcornnight.popcornnight_backend.service;
 
-import com.popcornnight.popcornnight_backend.entity.Hall;
+import com.popcornnight.popcornnight_backend.dto.hall.HallRequest;
+import com.popcornnight.popcornnight_backend.dto.hall.HallResponse;
 
 import java.util.List;
 
 public interface HallService {
-    List<Hall> getAllHalls();
+    List<HallResponse> getAllHalls();
 
-    Hall getHallById(Long hallId);
+    HallResponse getHallById(Long hallId);
 
-    Hall createHall(Hall hall);
+    HallResponse createHall(HallRequest hallRequest);
 
-    Hall updateHall(Long hallId, Hall hall);
+    HallResponse updateHall(Long hallId, HallRequest hallRequest);
 
     void deleteHall(Long hallId);
 }

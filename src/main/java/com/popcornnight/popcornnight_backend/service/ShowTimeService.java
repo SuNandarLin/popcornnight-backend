@@ -1,17 +1,18 @@
 package com.popcornnight.popcornnight_backend.service;
 
-import com.popcornnight.popcornnight_backend.entity.ShowTime;
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeRequest;
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
 
 import java.util.List;
 
 public interface ShowTimeService {
-    List<ShowTime> getAllShowTimes();
+    List<ShowTimeResponse> getAllShowTimes();
 
-    ShowTime getShowTimeById(Long showTimeId);
+    ShowTimeResponse getShowTimeById(Long showTimeId);
 
-    ShowTime createShowTime(ShowTime showTime);
+    ShowTimeResponse createShowTime(ShowTimeRequest showTimeRequest);
 
-    ShowTime updateShowTime(Long showTimeId, ShowTime showTime);
+    ShowTimeResponse updateShowTime(Long showTimeId, ShowTimeRequest showTimeRequest);
 
     void deleteShowTime(Long showTimeId);
 }

@@ -1,8 +1,5 @@
 package com.popcornnight.popcornnight_backend.dto.ticket;
 
-import com.popcornnight.popcornnight_backend.entity.ShowTime;
-import com.popcornnight.popcornnight_backend.entity.User;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +16,6 @@ public class TicketRequest {
     private String status;
     private Float price;
     private String qrcodeUrl;
-    private User user;
-    private ShowTime showTime;
+    private Long userId;
+    private Long showTimeId;
 }

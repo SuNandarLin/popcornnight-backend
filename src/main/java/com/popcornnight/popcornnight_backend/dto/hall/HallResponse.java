@@ -18,7 +18,7 @@ import lombok.Setter;
 public class HallResponse {
     private long id;
     private String hallNumber;
-    private String totalSeats;
+    private Integer totalSeats;
     private String status;
     private List<List<String>> seatNoGrid;
     private Theatre theatre;

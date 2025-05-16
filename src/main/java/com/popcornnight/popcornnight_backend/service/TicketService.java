@@ -1,17 +1,18 @@
 package com.popcornnight.popcornnight_backend.service;
 
-import com.popcornnight.popcornnight_backend.entity.Ticket;
+import com.popcornnight.popcornnight_backend.dto.ticket.TicketRequest;
+import com.popcornnight.popcornnight_backend.dto.ticket.TicketResponse;
 
 import java.util.List;
 
 public interface TicketService {
-    List<Ticket> getAllTickets();
+    List<TicketResponse> getAllTickets();
 
-    Ticket getTicketById(Long ticketId);
+    TicketResponse getTicketById(Long ticketId);
 
-    Ticket createTicket(Ticket ticket);
+    TicketResponse createTicket(TicketRequest ticketRequest);
 
-    Ticket updateTicket(Long ticketId, Ticket ticket);
+    TicketResponse updateTicket(Long ticketId, TicketRequest ticketRequest);
 
     void deleteTicket(Long ticketId);
 }
