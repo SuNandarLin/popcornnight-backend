@@ -23,6 +23,11 @@ public class TheatreController {
         return theatreService.getAllTheatres();
     }
 
+    @GetMapping("/theatredetails")
+    public List<TheatreResponse> getAllTheatresWithDetails() {
+        return theatreService.getAllTheatresWithDetails();
+    }
+
     @GetMapping("/{id}")
     public TheatreResponse getTheatreById(@PathVariable Long id) {
         return theatreService.getTheatreById(id);

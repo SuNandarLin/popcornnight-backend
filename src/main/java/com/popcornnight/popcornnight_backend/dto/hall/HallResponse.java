@@ -2,6 +2,7 @@ package com.popcornnight.popcornnight_backend.dto.hall;
 
 import java.util.List;
 
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
 import com.popcornnight.popcornnight_backend.entity.Theatre;
 
 import lombok.AllArgsConstructor;
@@ -21,5 +22,5 @@ public class HallResponse {
     private Integer totalSeats;
     private String status;
     private List<List<String>> seatNoGrid;
-    private Theatre theatre;
+    private List<ShowTimeResponse> showTimes;
 }

@@ -101,7 +101,8 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTimeRepository.deleteById(showTimeId);
     }
 
-    private ShowTimeResponse convertToShowTimeResponse(ShowTime showTime) {
+    @Override
+    public ShowTimeResponse convertToShowTimeResponse(ShowTime showTime) {
         return ShowTimeResponse.builder()
                 .id(showTime.getId())
                 .timeslot(showTime.getTimeslot())

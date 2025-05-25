@@ -12,6 +12,8 @@ import java.util.Set;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -46,6 +48,7 @@ public class ShowTime {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "hall_id", nullable = false, referencedColumnName = "id")
+    @JsonBackReference
     private Hall hall;
 
     @OneToMany(mappedBy = "showTime", cascade = CascadeType.MERGE)

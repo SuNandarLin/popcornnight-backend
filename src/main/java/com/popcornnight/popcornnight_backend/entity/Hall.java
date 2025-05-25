@@ -12,6 +12,9 @@ import java.util.Set;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -42,8 +45,10 @@ public class Hall {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "theatre_id", nullable = false, referencedColumnName = "id")
+    @JsonBackReference
     private Theatre theatre;
 
     @OneToMany(mappedBy = "hall", cascade = CascadeType.MERGE)
+    @JsonManagedReference
     private Set<ShowTime> showTimes;
 }

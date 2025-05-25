@@ -1,5 +1,6 @@
 package com.popcornnight.popcornnight_backend.service;
 
+import com.popcornnight.popcornnight_backend.dto.hall.HallResponse;
 import com.popcornnight.popcornnight_backend.dto.theatre.TheatreRequest;
 import com.popcornnight.popcornnight_backend.dto.theatre.TheatreResponse;
 import com.popcornnight.popcornnight_backend.entity.Theatre;
@@ -18,6 +19,14 @@ import java.util.stream.Collectors;
 public class TheatreServiceImpl implements TheatreService {
 
     private final TheatreRepository theatreRepository;
+    private final HallService hallService;
+
+    @Override
+    public List<TheatreResponse> getAllTheatresWithDetails() {
+        return theatreRepository.findAllWithHallsAndShowtimes().stream()
+                .map(this::convertToTheatreResponse)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<TheatreResponse> getAllTheatres() {
@@ -70,11 +79,17 @@ public class TheatreServiceImpl implements TheatreService {
     }
 
     private TheatreResponse convertToTheatreResponse(Theatre theatre) {
+
+        List<HallResponse> hallResponses = theatre.getHalls().stream()
+                .map(hall -> hallService.convertToHallResponse(hall))
+                .collect(Collectors.toList());
+
         return TheatreResponse.builder()
                 .id(theatre.getId())
                 .name(theatre.getName())
                 .branch(theatre.getBranch())
                 .location(theatre.getLocation())
+                .halls(hallResponses)
                 .build();
     }
 }

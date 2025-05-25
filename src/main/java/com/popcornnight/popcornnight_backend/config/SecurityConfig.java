@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Public access to authentication endpoints
                         .requestMatchers("/api/movies/**").permitAll() // Public movie endpoints
+                        .requestMatchers("/api/theatres/**").permitAll()
+                        .requestMatchers("/api/halls/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN") // Admin only
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),

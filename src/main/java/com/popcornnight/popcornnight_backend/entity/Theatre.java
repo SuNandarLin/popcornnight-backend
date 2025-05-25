@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -33,5 +35,6 @@ public class Theatre {
     private String location;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.MERGE)
+    @JsonManagedReference
     private Set<Hall> halls;
 }

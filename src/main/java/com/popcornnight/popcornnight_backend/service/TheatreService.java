@@ -6,6 +6,8 @@ import com.popcornnight.popcornnight_backend.dto.theatre.TheatreResponse;
 import java.util.List;
 
 public interface TheatreService {
+    List<TheatreResponse> getAllTheatresWithDetails();
+
     List<TheatreResponse> getAllTheatres();
 
     TheatreResponse getTheatreById(Long theatreId);

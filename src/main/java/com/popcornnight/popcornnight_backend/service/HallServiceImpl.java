@@ -2,6 +2,7 @@ package com.popcornnight.popcornnight_backend.service;
 
 import com.popcornnight.popcornnight_backend.dto.hall.HallRequest;
 import com.popcornnight.popcornnight_backend.dto.hall.HallResponse;
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
 import com.popcornnight.popcornnight_backend.entity.Hall;
 import com.popcornnight.popcornnight_backend.entity.Theatre;
 import com.popcornnight.popcornnight_backend.repository.HallRepository;
@@ -22,6 +23,7 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final TheatreRepository theatreRepository;
+    private final ShowTimeService showTimeService;
 
     @Override
     public List<HallResponse> getAllHalls() {
@@ -89,14 +91,19 @@ public class HallServiceImpl implements HallService {
         hallRepository.deleteById(hallId);
     }
 
-    private HallResponse convertToHallResponse(Hall hall) {
+    @Override
+    public HallResponse convertToHallResponse(Hall hall) {
+        List<ShowTimeResponse> showtimeResponses = hall.getShowTimes().stream()
+                .map(showTime -> showTimeService.convertToShowTimeResponse(showTime))
+                .collect(Collectors.toList());
+
         return HallResponse.builder()
                 .id(hall.getId())
                 .hallNumber(hall.getHallNumber())
                 .totalSeats(hall.getTotalSeats())
                 .status(hall.getStatus())
                 .seatNoGrid(hall.getSeatNoGrid())
-                .theatre(hall.getTheatre())
+                .showTimes(showtimeResponses)
                 .build();
     }
 }

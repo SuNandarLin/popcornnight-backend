@@ -1,5 +1,9 @@
 package com.popcornnight.popcornnight_backend.dto.theatre;
 
+import java.util.List;
+
+import com.popcornnight.popcornnight_backend.dto.hall.HallResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,4 +20,5 @@ public class TheatreResponse {
     private String name;
     private String branch;
     private String location;
+    private List<HallResponse> halls;
 }
