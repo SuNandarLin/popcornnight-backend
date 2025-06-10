@@ -33,7 +33,7 @@ public class ShowTime {
     private String timeslot;
 
     @Column(name = "timestamp")
-    private Integer timestamp;
+    private Long timestamp;
 
     @Column(name = "is_published")
     private Boolean isPublished;

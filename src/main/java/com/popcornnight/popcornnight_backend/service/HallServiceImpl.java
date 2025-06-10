@@ -1,8 +1,8 @@
 package com.popcornnight.popcornnight_backend.service;
 
+import com.popcornnight.popcornnight_backend.converter.HallConverter;
 import com.popcornnight.popcornnight_backend.dto.hall.HallRequest;
 import com.popcornnight.popcornnight_backend.dto.hall.HallResponse;
-import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
 import com.popcornnight.popcornnight_backend.entity.Hall;
 import com.popcornnight.popcornnight_backend.entity.Theatre;
 import com.popcornnight.popcornnight_backend.repository.HallRepository;
@@ -23,12 +23,12 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final TheatreRepository theatreRepository;
-    private final ShowTimeService showTimeService;
+    private final HallConverter hallConverter;
 
     @Override
     public List<HallResponse> getAllHalls() {
         return hallRepository.findAll().stream()
-                .map(this::convertToHallResponse)
+                .map(hallConverter::convertToHallResponse)
                 .collect(Collectors.toList());
     }
 
@@ -37,7 +37,7 @@ public class HallServiceImpl implements HallService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Hall not found with id " + hallId));
-        return convertToHallResponse(hall);
+        return hallConverter.convertToHallResponse(hall);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class HallServiceImpl implements HallService {
                 .build();
 
         Hall savedHall = hallRepository.save(hall);
-        return convertToHallResponse(savedHall);
+        return hallConverter.convertToHallResponse(savedHall);
     }
 
     @Override
@@ -83,27 +83,11 @@ public class HallServiceImpl implements HallService {
             existingHall.setTheatre(theatre);
         }
         Hall updatedHall = hallRepository.save(existingHall);
-        return convertToHallResponse(updatedHall);
+        return hallConverter.convertToHallResponse(updatedHall);
     }
 
     @Override
     public void deleteHall(Long hallId) {
         hallRepository.deleteById(hallId);
-    }
-
-    @Override
-    public HallResponse convertToHallResponse(Hall hall) {
-        List<ShowTimeResponse> showtimeResponses = hall.getShowTimes().stream()
-                .map(showTime -> showTimeService.convertToShowTimeResponse(showTime))
-                .collect(Collectors.toList());
-
-        return HallResponse.builder()
-                .id(hall.getId())
-                .hallNumber(hall.getHallNumber())
-                .totalSeats(hall.getTotalSeats())
-                .status(hall.getStatus())
-                .seatNoGrid(hall.getSeatNoGrid())
-                .showTimes(showtimeResponses)
-                .build();
     }
 }

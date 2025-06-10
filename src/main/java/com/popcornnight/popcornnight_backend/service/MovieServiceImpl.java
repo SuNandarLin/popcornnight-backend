@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.popcornnight.popcornnight_backend.converter.MovieConverter;
 import com.popcornnight.popcornnight_backend.dto.movie.MovieRequest;
 import com.popcornnight.popcornnight_backend.dto.movie.MovieResponse;
 import com.popcornnight.popcornnight_backend.entity.Movie;
@@ -20,19 +21,14 @@ import lombok.AllArgsConstructor;
 public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
+    private MovieConverter movieConverter;
 
     @Override
     @Transactional
     public List<MovieResponse> getAllMovies() {
         List<MovieResponse> movieResponseList = movieRepository
                 .findAll().stream()
-                .map(movie -> MovieResponse.builder()
-                        .id(movie.getId())
-                        .title(movie.getTitle())
-                        .description(movie.getDescription())
-                        .releaseDate(movie.getReleaseDate())
-                        .duration(movie.getDuration())
-                        .build())
+                .map(movieConverter::convertToMovieResponse)
                 .collect(Collectors.toList());
         return movieResponseList;
     }
@@ -41,13 +37,7 @@ public class MovieServiceImpl implements MovieService {
     @Transactional
     public MovieResponse getMovieById(Long movieId) {
         return movieRepository.findById(movieId)
-                .map(movie -> MovieResponse.builder()
-                        .id(movie.getId())
-                        .title(movie.getTitle())
-                        .description(movie.getDescription())
-                        .releaseDate(movie.getReleaseDate())
-                        .duration(movie.getDuration())
-                        .build())
+                .map(movieConverter::convertToMovieResponse)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found with id " + movieId));
     }
@@ -64,13 +54,7 @@ public class MovieServiceImpl implements MovieService {
 
         Movie savedMovie = movieRepository.save(movie);
 
-        return MovieResponse.builder()
-                .id(savedMovie.getId())
-                .title(savedMovie.getTitle())
-                .description(savedMovie.getDescription())
-                .releaseDate(savedMovie.getReleaseDate())
-                .duration(savedMovie.getDuration())
-                .build();
+        return movieConverter.convertToMovieResponse(savedMovie);
     }
 
     @Override
@@ -95,13 +79,7 @@ public class MovieServiceImpl implements MovieService {
 
         Movie updatedMovie = movieRepository.save(movie);
 
-        return MovieResponse.builder()
-                .id(updatedMovie.getId())
-                .title(updatedMovie.getTitle())
-                .description(updatedMovie.getDescription())
-                .releaseDate(updatedMovie.getReleaseDate())
-                .duration(updatedMovie.getDuration())
-                .build();
+        return movieConverter.convertToMovieResponse(updatedMovie);
     }
 
     @Override
@@ -110,4 +88,5 @@ public class MovieServiceImpl implements MovieService {
         movieRepository.deleteById(movieId);
         return "Success Deleting Movie Id " + movieId;
     }
+
 }

@@ -1,6 +1,8 @@
 package com.popcornnight.popcornnight_backend.service;
 
+import com.popcornnight.popcornnight_backend.converter.ShowtimeConverter;
 import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeRequest;
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeRequests;
 import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
 import com.popcornnight.popcornnight_backend.entity.Hall;
 import com.popcornnight.popcornnight_backend.entity.Movie;
@@ -8,12 +10,17 @@ import com.popcornnight.popcornnight_backend.entity.ShowTime;
 import com.popcornnight.popcornnight_backend.repository.HallRepository;
 import com.popcornnight.popcornnight_backend.repository.MovieRepository;
 import com.popcornnight.popcornnight_backend.repository.ShowTimeRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,11 +31,58 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private final ShowTimeRepository showTimeRepository;
     private final MovieRepository movieRepository;
     private final HallRepository hallRepository;
+    private ShowtimeConverter showtimeConverter;
+
+    @Override
+    @Transactional
+    public List<ShowTimeResponse> createMultipleShowTimes(ShowTimeRequests showTimeRequests) {
+        List<ShowTime> entities = showTimeRequests.getShowtimes().stream()
+                .map(req -> {
+                    ShowTime entity = new ShowTime();
+                    entity.setTimestamp(req.getTimestamp());
+                    entity.setTimeslot(req.getTimeslot());
+                    entity.setSeatStatusGrid(req.getSeatStatusGrid());
+                    entity.setIsPublished(req.getIsPublished());
+
+                    Movie movie = movieRepository.findById(req.getMovieId())
+                            .orElseThrow(() -> new RuntimeException("Movie not found with ID: " + req.getMovieId()));
+                    Hall hall = hallRepository.findById(req.getHallId())
+                            .orElseThrow(() -> new RuntimeException("Hall not found with ID: " + req.getHallId()));
+
+                    entity.setMovie(movie);
+                    entity.setHall(hall);
+
+                    return entity;
+                })
+                .collect(Collectors.toList());
+
+        List<ShowTime> savedEntities = showTimeRepository.saveAll(entities);
+
+        List<ShowTimeResponse> responses = savedEntities.stream()
+                .map(showtimeConverter::convertToShowTimeResponse)
+                .collect(Collectors.toList());
+
+        return responses;
+    }
+
+    public List<ShowTimeResponse> getShowTimesByDate(LocalDate date) {
+        ZoneId zone = ZoneId.systemDefault();
+        long start = date.atStartOfDay(zone).toInstant().toEpochMilli();
+        long end = date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+
+        List<ShowTime> showtimes = showTimeRepository.findByTimestampBetween(start, end);
+
+        List<ShowTimeResponse> responses = showtimes.stream()
+                .map(showtimeConverter::convertToShowTimeResponse)
+                .collect(Collectors.toList());
+
+        return responses;
+    }
 
     @Override
     public List<ShowTimeResponse> getAllShowTimes() {
         return showTimeRepository.findAll().stream()
-                .map(this::convertToShowTimeResponse)
+                .map(showtimeConverter::convertToShowTimeResponse)
                 .collect(Collectors.toList());
     }
 
@@ -37,7 +91,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         ShowTime showTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "ShowTime not found with id " + showTimeId));
-        return convertToShowTimeResponse(showTime);
+        return showtimeConverter.convertToShowTimeResponse(showTime);
     }
 
     @Override
@@ -58,7 +112,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
                 .build();
 
         ShowTime savedShowTime = showTimeRepository.save(showTime);
-        return convertToShowTimeResponse(savedShowTime);
+        return showtimeConverter.convertToShowTimeResponse(savedShowTime);
     }
 
     @Override
@@ -93,7 +147,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
             existingShowTime.setHall(hall);
         }
         ShowTime updatedShowTime = showTimeRepository.save(existingShowTime);
-        return convertToShowTimeResponse(updatedShowTime);
+        return showtimeConverter.convertToShowTimeResponse(updatedShowTime);
     }
 
     @Override
@@ -102,15 +156,8 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTimeResponse convertToShowTimeResponse(ShowTime showTime) {
-        return ShowTimeResponse.builder()
-                .id(showTime.getId())
-                .timeslot(showTime.getTimeslot())
-                .timestamp(showTime.getTimestamp())
-                .isPublished(showTime.getIsPublished())
-                .seatStatusGrid(showTime.getSeatStatusGrid())
-                .movie(showTime.getMovie())
-                .hall(showTime.getHall())
-                .build();
+    public void deleteShowtimes(@RequestBody List<Long> ids) {
+        showTimeRepository.deleteAllById(ids);
     }
+
 }

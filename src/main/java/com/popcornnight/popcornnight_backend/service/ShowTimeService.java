@@ -1,12 +1,19 @@
 package com.popcornnight.popcornnight_backend.service;
 
 import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeRequest;
+import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeRequests;
 import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
-import com.popcornnight.popcornnight_backend.entity.ShowTime;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.RequestBody;
+
 public interface ShowTimeService {
+    List<ShowTimeResponse> createMultipleShowTimes(ShowTimeRequests showTimeRequests);
+
+    List<ShowTimeResponse> getShowTimesByDate(LocalDate date);
+
     List<ShowTimeResponse> getAllShowTimes();
 
     ShowTimeResponse getShowTimeById(Long showTimeId);
@@ -17,5 +24,6 @@ public interface ShowTimeService {
 
     void deleteShowTime(Long showTimeId);
 
-    ShowTimeResponse convertToShowTimeResponse(ShowTime showTime);
+    void deleteShowtimes(@RequestBody List<Long> ids);
+
 }

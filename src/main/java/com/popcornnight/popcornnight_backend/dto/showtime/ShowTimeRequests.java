@@ -13,11 +13,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShowTimeRequest {
-    private String timeslot;
-    private Long timestamp;
-    private Boolean isPublished;
-    private List<List<Integer>> seatStatusGrid;
-    private Long movieId;
-    private Long hallId;
+public class ShowTimeRequests {
+    private List<ShowTimeRequest> showtimes;
 }

@@ -27,6 +27,29 @@ public class TicketServiceImpl implements TicketService {
     private final ShowTimeRepository showTimeRepository;
 
     @Override
+    public TicketResponse confirmTicket(TicketRequest ticketRequest) {
+        User user = userRepository.findById(ticketRequest.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "User not found with id " + ticketRequest.getUserId()));
+
+        ShowTime showTime = showTimeRepository.findById(ticketRequest.getShowTimeId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Showtime not found with id " + ticketRequest.getShowTimeId()));
+
+        Ticket ticket = Ticket.builder()
+                .seatNumber(ticketRequest.getSeatNumber())
+                .price(ticketRequest.getPrice())
+                .status(ticketRequest.getStatus())
+                .qrcodeUrl(ticketRequest.getQrcodeUrl())
+                .user(user)
+                .showTime(showTime)
+                .build();
+
+        Ticket savedTicket = ticketRepository.save(ticket);
+        return convertToTicketResponse(savedTicket);
+    }
+
+    @Override
     public List<TicketResponse> getAllTickets() {
         return ticketRepository.findAll().stream()
                 .map(this::convertToTicketResponse)
