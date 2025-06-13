@@ -19,3 +19,9 @@ public class TicketRequest {
     private Long userId;
     private Long showTimeId;
 }
+
+enum TicketStatus {
+    VALID,
+    REDEEMED,
+    EXPIRED
+}

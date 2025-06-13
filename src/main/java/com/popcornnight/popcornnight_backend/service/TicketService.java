@@ -6,7 +6,7 @@ import com.popcornnight.popcornnight_backend.dto.ticket.TicketResponse;
 import java.util.List;
 
 public interface TicketService {
-    TicketResponse confirmTicket(TicketRequest ticketRequest);
+    List<TicketResponse> issueTicket(List<TicketRequest> ticketRequest);
 
     List<TicketResponse> getAllTickets();
 

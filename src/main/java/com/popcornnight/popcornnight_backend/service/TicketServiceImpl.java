@@ -8,6 +8,7 @@ import com.popcornnight.popcornnight_backend.entity.User;
 import com.popcornnight.popcornnight_backend.repository.ShowTimeRepository;
 import com.popcornnight.popcornnight_backend.repository.TicketRepository;
 import com.popcornnight.popcornnight_backend.repository.UserRepository;
+import com.popcornnight.popcornnight_backend.utils.QRCodeGenerator;
 
 import lombok.AllArgsConstructor;
 
@@ -15,8 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 @Service
 @AllArgsConstructor
@@ -25,28 +31,62 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final ShowTimeRepository showTimeRepository;
+    private final FirebaseStorageService firebaseStorageService;
 
     @Override
-    public TicketResponse confirmTicket(TicketRequest ticketRequest) {
-        User user = userRepository.findById(ticketRequest.getUserId())
+    public List<TicketResponse> issueTicket(List<TicketRequest> ticketRequests) {
+        if (ticketRequests == null || ticketRequests.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ticket request list is empty");
+        }
+
+        Long userId = ticketRequests.get(0).getUserId();
+        Long showTimeId = ticketRequests.get(0).getShowTimeId();
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "User not found with id " + ticketRequest.getUserId()));
+                        HttpStatus.BAD_REQUEST, "User not found with id " + userId));
 
-        ShowTime showTime = showTimeRepository.findById(ticketRequest.getShowTimeId())
+        ShowTime showTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Showtime not found with id " + ticketRequest.getShowTimeId()));
+                        HttpStatus.BAD_REQUEST, "Showtime not found with id " + showTimeId));
 
-        Ticket ticket = Ticket.builder()
-                .seatNumber(ticketRequest.getSeatNumber())
-                .price(ticketRequest.getPrice())
-                .status(ticketRequest.getStatus())
-                .qrcodeUrl(ticketRequest.getQrcodeUrl())
-                .user(user)
-                .showTime(showTime)
-                .build();
+        List<Ticket> tickets = ticketRequests.stream().map(req -> {
+            String qrContent = String.format(
+                    "showTimeId:%d|movie:%s|seat:%s|timestamp:%d|uuid:%s",
+                    showTime.getId(),
+                    showTime.getMovie() != null ? showTime.getMovie().getTitle() : "",
+                    req.getSeatNumber(),
+                    System.currentTimeMillis(),
+                    java.util.UUID.randomUUID().toString());
+            byte[] qrImageBytes = new byte[0];
+            try {
+                BufferedImage qrImage = QRCodeGenerator.generateQRCodeImage(qrContent, 300, 300);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(qrImage, "PNG", baos);
+                qrImageBytes = baos.toByteArray();
 
-        Ticket savedTicket = ticketRepository.save(ticket);
-        return convertToTicketResponse(savedTicket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // Upload to Firebase
+            String uniqueFileName = UUID.randomUUID() + ".png";
+            String publicUrl = firebaseStorageService.uploadQRCode(qrImageBytes, uniqueFileName);
+
+            return Ticket.builder()
+                    .seatNumber(req.getSeatNumber())
+                    .price((float) 123.0)
+                    .status("VALID")
+                    .qrcodeUrl(publicUrl)
+                    .user(user)
+                    .showTime(showTime)
+                    .build();
+        }).collect(Collectors.toList());
+
+        List<Ticket> savedTickets = ticketRepository.saveAll(tickets);
+
+        return savedTickets.stream()
+                .map(this::convertToTicketResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
