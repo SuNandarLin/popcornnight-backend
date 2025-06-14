@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = user.getRole(); // Get role from DB (e.g., "ADMIN")
+        String role = user.getRole().name(); // Get role from DB enum (e.g., "ADMIN")
         if (!role.startsWith("ROLE_")) {
             role = "ROLE_" + role; // Convert "ADMIN" to "ROLE_ADMIN"
         }

@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/theatres/**").permitAll()
                         .requestMatchers("/api/halls/**").permitAll()
                         .requestMatchers("/api/showtimes/**").permitAll()
+                        .requestMatchers("/api/tickets/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN") // Admin only
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),

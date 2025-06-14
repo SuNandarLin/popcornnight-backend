@@ -18,6 +18,12 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    @PostMapping("/issue")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<TicketResponse> issueTicket(@RequestBody List<TicketRequest> ticketRequests) {
+        return ticketService.issueTicket(ticketRequests);
+    }
+
     @GetMapping
     public List<TicketResponse> getAllTickets() {
         return ticketService.getAllTickets();
