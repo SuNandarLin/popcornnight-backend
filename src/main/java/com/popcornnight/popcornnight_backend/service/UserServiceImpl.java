@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.popcornnight.popcornnight_backend.dto.user.USER_ROLE;
 import com.popcornnight.popcornnight_backend.dto.user.UserRequest;
 import com.popcornnight.popcornnight_backend.dto.user.UserResponse;
 import com.popcornnight.popcornnight_backend.entity.User;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
                         .name(user.getName())
                         .phoneNumber(user.getPhoneNumber())
                         .email(user.getEmail())
-                        .role(user.getRole())
+                        .role(user.getRole().name())
                         .build())
                 .collect(Collectors.toList());
         return userResponseList;
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
                         .name(user.getName())
                         .phoneNumber(user.getPhoneNumber())
                         .email(user.getEmail())
-                        .role(user.getRole())
+                        .role(user.getRole().name())
                         .build())
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id " + userId));
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
                 .password(userRequest.getPassword())
                 .phoneNumber(userRequest.getPhoneNumber())
                 .email(userRequest.getEmail())
-                .role(userRequest.getRole())
+                .role(USER_ROLE.valueOf(userRequest.getRole()))
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -74,7 +75,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
-                .role(user.getRole())
+                .role(user.getRole().name())
                 .build();
     }
 
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userRequest.getRole() != null && !userRequest.getRole().isEmpty()) {
-            user.setRole(userRequest.getRole());
+            user.setRole(USER_ROLE.valueOf(userRequest.getRole()));
         }
 
         User updatedUser = userRepository.save(user);
@@ -110,7 +111,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
-                .role(user.getRole())
+                .role(user.getRole().name())
                 .build();
     }
 

@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.util.Set;
 
+import com.popcornnight.popcornnight_backend.dto.user.USER_ROLE;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -38,8 +40,9 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private String role;
+    private USER_ROLE role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
     private Set<Ticket> tickets;

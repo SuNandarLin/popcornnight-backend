@@ -21,7 +21,7 @@ public class FirebaseConfig {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setStorageBucket("*.appspot.com")
+                    .setStorageBucket("popcornnight-a23cb.firebasestorage.app")
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {

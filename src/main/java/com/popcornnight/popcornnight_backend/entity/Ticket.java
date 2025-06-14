@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.popcornnight.popcornnight_backend.dto.ticket.TICKET_STATUS;
+
 import jakarta.persistence.*;
 
 @Builder
@@ -24,7 +27,8 @@ public class Ticket {
     private String seatNumber;
 
     @Column(name = "status")
-    private String status; // enum or string
+    @Enumerated(EnumType.STRING)
+    private TICKET_STATUS status; // enum or string
 
     @Column(name = "price")
     private Float price;
