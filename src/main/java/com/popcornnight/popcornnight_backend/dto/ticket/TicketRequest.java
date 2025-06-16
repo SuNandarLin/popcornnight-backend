@@ -1,5 +1,7 @@
 package com.popcornnight.popcornnight_backend.dto.ticket;
 
+import java.util.List;
+
 import com.popcornnight.popcornnight_backend.dto.user.USER_ROLE;
 
 import lombok.AllArgsConstructor;
@@ -14,10 +16,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketRequest {
-    private String seatNumber;
-    private Float price;
+    private List<String> seatNumbers;
     private USER_ROLE userRole;
     private Long userId;
     private Long showTimeId;
     private TICKET_STATUS status;
+    private String qrId;
 }

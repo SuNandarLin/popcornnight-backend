@@ -42,6 +42,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
                     entity.setTimestamp(req.getTimestamp());
                     entity.setTimeslot(req.getTimeslot());
                     entity.setSeatStatusGrid(req.getSeatStatusGrid());
+                    entity.setPrice(req.getPrice());
                     entity.setIsPublished(req.getIsPublished());
 
                     Movie movie = movieRepository.findById(req.getMovieId())

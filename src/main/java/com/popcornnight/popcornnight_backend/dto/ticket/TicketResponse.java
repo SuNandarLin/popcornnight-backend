@@ -1,7 +1,9 @@
 package com.popcornnight.popcornnight_backend.dto.ticket;
 
-import com.google.firebase.remoteconfig.internal.TemplateResponse.UserResponse;
+import java.util.List;
+
 import com.popcornnight.popcornnight_backend.dto.showtime.ShowTimeResponse;
+import com.popcornnight.popcornnight_backend.dto.user.UserResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TicketResponse {
     private long id;
-    private String seatNumber;
+    private List<String> seatNumbers;
     private TICKET_STATUS status;
     private Float price;
     private String qrcodeUrl;
@@ -24,4 +26,5 @@ public class TicketResponse {
     private ShowTimeResponse showTime;
     private long userId;
     private long showTimeId;
+    private String qrId;
 }

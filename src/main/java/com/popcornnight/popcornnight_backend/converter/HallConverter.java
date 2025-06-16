@@ -9,9 +9,6 @@ import com.popcornnight.popcornnight_backend.entity.Hall;
 public class HallConverter {
 
     public HallResponse convertToHallResponse(Hall hall) {
-        // List<ShowTimeResponse> showtimeResponses = hall.getShowTimes().stream()
-        // .map(showtimeConverter::convertToShowTimeResponse)
-        // .collect(Collectors.toList());
 
         return HallResponse.builder()
                 .id(hall.getId())
@@ -19,7 +16,7 @@ public class HallConverter {
                 .totalSeats(hall.getTotalSeats())
                 .status(hall.getStatus())
                 .seatNoGrid(hall.getSeatNoGrid())
-                // .showTimes(showtimeResponses)
+                // .theatre(hall.getTheatre())
                 .build();
     }
 }

@@ -22,6 +22,7 @@ public class ShowTimeResponse {
     private Long timestamp;
     private Boolean isPublished;
     private List<List<Integer>> seatStatusGrid;
+    private Float price;
     private MovieResponse movie;
     private HallResponse hall;
     private Long movieId;

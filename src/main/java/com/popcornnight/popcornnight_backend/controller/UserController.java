@@ -26,7 +26,6 @@ public class UserController {
 
     @PostMapping("/register")
     public UserResponse registerUser(@RequestBody UserRequest user) {
-        // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userService.createUser(user);
     }

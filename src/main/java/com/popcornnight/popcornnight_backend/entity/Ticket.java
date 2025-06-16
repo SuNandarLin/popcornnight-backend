@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.popcornnight.popcornnight_backend.dto.ticket.TICKET_STATUS;
 
 import jakarta.persistence.*;
@@ -23,18 +28,19 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "seat_number")
-    private String seatNumber;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "seat_number", columnDefinition = "json")
+    private List<String> seatNumber;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TICKET_STATUS status; // enum or string
 
-    @Column(name = "price")
-    private Float price;
-
     @Column(name = "qrcode_url")
     private String qrcodeUrl;
+
+    @Column(name = "qr_id")
+    private String qrId;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")

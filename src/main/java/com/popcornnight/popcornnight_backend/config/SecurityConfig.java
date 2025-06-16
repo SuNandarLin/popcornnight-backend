@@ -41,7 +41,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/halls/**").permitAll()
                         .requestMatchers("/api/showtimes/**").permitAll()
                         .requestMatchers("/api/tickets/**").permitAll()
-                        .requestMatchers("/api/users/**").hasRole("ADMIN") // Admin only
+                        .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/dashboard/**").permitAll()
+
+                        .requestMatchers("/api/users/**").permitAll()
+
+                        // .requestMatchers("/api/users/**").hasRole("ADMIN") // Admin only
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);
