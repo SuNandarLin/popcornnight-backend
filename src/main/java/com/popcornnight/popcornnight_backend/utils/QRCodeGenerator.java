@@ -21,7 +21,7 @@ public class QRCodeGenerator {
         qrData.put("qrId", qRcodeInfo.getQrId());
         qrData.put("ticketId", qRcodeInfo.getTicketId());
         qrData.put("ticketStatus", qRcodeInfo.getTicketStatus());
-        qrData.put("seatNumber", qRcodeInfo.getSeatNumber());
+        qrData.put("seatNumber", qRcodeInfo.getSeatNumbers());
         qrData.put("movieTitle", qRcodeInfo.getMovieTitle());
         qrData.put("showTimeslot", qRcodeInfo.getShowTimeslot());
         qrData.put("geneartedAt", qRcodeInfo.getGeneartedAt());

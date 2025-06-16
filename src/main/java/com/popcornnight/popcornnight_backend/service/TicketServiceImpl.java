@@ -4,6 +4,7 @@ import com.popcornnight.popcornnight_backend.dto.ticket.TicketQRcodeInfo;
 import com.popcornnight.popcornnight_backend.dto.ticket.TicketRequest;
 import com.popcornnight.popcornnight_backend.dto.ticket.TicketResponse;
 import com.popcornnight.popcornnight_backend.dto.user.USER_ROLE;
+import com.popcornnight.popcornnight_backend.dto.user.UserResponse;
 import com.popcornnight.popcornnight_backend.converter.ShowtimeConverter;
 import com.popcornnight.popcornnight_backend.dto.ticket.TICKET_STATUS;
 import com.popcornnight.popcornnight_backend.entity.ShowTime;
@@ -37,18 +38,6 @@ public class TicketServiceImpl implements TicketService {
     private final ShowTimeRepository showTimeRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final ShowtimeConverter showtimeConverter;
-
-    // public TicketServiceImpl(
-    // TicketRepository ticketRepository,
-    // UserRepository userRepository,
-    // ShowTimeRepository showTimeRepository,
-    // FirebaseStorageService firebaseStorageService) {
-    // this.ticketRepository = ticketRepository;
-    // this.userRepository = userRepository;
-    // this.showTimeRepository = showTimeRepository;
-    // this.firebaseStorageService = firebaseStorageService;
-    // }
-
     private Long guestUserId;
 
     @PostConstruct
@@ -63,64 +52,59 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<TicketResponse> issueTicket(List<TicketRequest> ticketRequests) {
-        if (ticketRequests == null || ticketRequests.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ticket request list is empty");
+    public TicketResponse issueTicket(TicketRequest ticketRequest) {
+        if (ticketRequest == null || ticketRequest.getSeatNumbers() == null
+                || ticketRequest.getSeatNumbers().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seat number list is empty");
         }
 
-        Long userId = (ticketRequests.get(0).getUserRole() == USER_ROLE.GUEST)
+        Long showTimeId = ticketRequest.getShowTimeId();
+        Long userId = (ticketRequest.getUserRole() == USER_ROLE.GUEST)
                 ? getGuestUserId()
-                : ticketRequests.get(0).getUserId();
-        Long showTimeId = ticketRequests.get(0).getShowTimeId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "User not found with id " + userId));
+                : ticketRequest.getUserId();
 
         ShowTime showTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Showtime not found with id " + showTimeId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "User not found with id " + userId));
 
-        List<Ticket> ticketsToSave = ticketRequests.stream().map(req -> Ticket.builder()
-                .seatNumber(req.getSeatNumber())
-                .price(req.getPrice())
+        List<String> seatNumbers = ticketRequest.getSeatNumbers();
+
+        Ticket ticket = Ticket.builder()
+                .seatNumber(seatNumbers)
                 .status(TICKET_STATUS.VALID)
                 .user(user)
                 .showTime(showTime)
-                .build()).collect(Collectors.toList());
+                .build();
+        Ticket savedTicket = ticketRepository.save(ticket);
 
-        List<Ticket> savedTickets = ticketRepository.saveAll(ticketsToSave);
-
-        for (int i = 0; i < savedTickets.size(); i++) {
-            Ticket ticket = savedTickets.get(i);
-
-            TicketQRcodeInfo ticketQRcodeInfo = TicketQRcodeInfo.builder()
-                    .qrId(java.util.UUID.randomUUID().toString())
-                    .ticketId(ticket.getId())
-                    .ticketStatus(TICKET_STATUS.VALID)
-                    .seatNumber(ticket.getSeatNumber())
-                    .movieTitle(showTime.getMovie().getTitle())
-                    .showTimeslot(showTime.getTimeslot())
-                    .geneartedAt(System.currentTimeMillis())
-                    .build();
-
-            String qrCodeImageUrl = "";
-            try {
-                BufferedImage qrImage = QRCodeGenerator.generateQRCodeImage(ticketQRcodeInfo, 300, 300);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(qrImage, "PNG", baos);
-                byte[] qrImageBytes = baos.toByteArray();
-                String uniqueFileName = ticketQRcodeInfo.getQrId() + ".png";
-                qrCodeImageUrl = firebaseStorageService.uploadQRCode(qrImageBytes, uniqueFileName);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ticket.setQrcodeUrl(qrCodeImageUrl);
+        TicketQRcodeInfo ticketQRcodeInfo = TicketQRcodeInfo.builder()
+                .qrId(java.util.UUID.randomUUID().toString())
+                .ticketId(savedTicket.getId())
+                .ticketStatus(TICKET_STATUS.VALID)
+                .seatNumbers(seatNumbers)
+                .movieTitle(showTime.getMovie().getTitle())
+                .showTimeslot(showTime.getTimeslot())
+                .geneartedAt(System.currentTimeMillis())
+                .build();
+        String qrCodeImageUrl = "";
+        try {
+            BufferedImage qrImage = QRCodeGenerator.generateQRCodeImage(ticketQRcodeInfo, 300, 300);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(qrImage, "PNG", baos);
+            byte[] qrImageBytes = baos.toByteArray();
+            String uniqueFileName = ticketQRcodeInfo.getQrId() + ".png";
+            qrCodeImageUrl = firebaseStorageService.uploadQRCode(qrImageBytes, uniqueFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        List<Ticket> updatedTickets = ticketRepository.saveAll(savedTickets);
+        savedTicket.setQrId(ticketQRcodeInfo.getQrId());
+        savedTicket.setQrcodeUrl(qrCodeImageUrl);
+        savedTicket = ticketRepository.save(savedTicket);
 
-        // Update seatStatusGrid after everything is successfully finished
         Object seatStatusGridObj = showTime.getSeatStatusGrid();
         Object seatNoGridObj = showTime.getHall().getSeatNoGrid();
 
@@ -129,8 +113,7 @@ public class TicketServiceImpl implements TicketService {
         @SuppressWarnings("unchecked")
         List<List<String>> seatNoGrid = (List<List<String>>) seatNoGridObj;
 
-        for (TicketRequest req : ticketRequests) {
-            String seatNumber = req.getSeatNumber();
+        for (String seatNumber : seatNumbers) {
             boolean found = false;
             for (int i = 0; i < seatNoGrid.size(); i++) {
                 List<String> row = seatNoGrid.get(i);
@@ -148,7 +131,13 @@ public class TicketServiceImpl implements TicketService {
         showTime.setSeatStatusGrid(seatStatusGrid);
         showTimeRepository.save(showTime);
 
-        return updatedTickets.stream()
+        return convertToTicketResponse(savedTicket);
+    }
+
+    @Override
+    public List<TicketResponse> getTicketsByUserId(Long userId) {
+        List<Ticket> tickets = ticketRepository.findByUserId(userId);
+        return tickets.stream()
                 .map(this::convertToTicketResponse)
                 .collect(Collectors.toList());
     }
@@ -156,6 +145,36 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public List<TicketResponse> getAllTickets() {
         return ticketRepository.findAll().stream()
+                .map(this::convertToTicketResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean verifyAndRedeemTicket(TicketQRcodeInfo ticketQRcodeInfo) {
+        if (ticketQRcodeInfo == null || ticketQRcodeInfo.getQrId() == null || ticketQRcodeInfo.getTicketId() == 0L) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid QR code info");
+        }
+
+        Ticket ticket = ticketRepository.findById(ticketQRcodeInfo.getTicketId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        if (!ticketQRcodeInfo.getQrId().equals(ticket.getQrId())) {
+            return false;
+        }
+
+        if (ticket.getStatus() != TICKET_STATUS.VALID) {
+            return false;
+        }
+
+        ticket.setStatus(TICKET_STATUS.REDEEMED);
+        ticketRepository.save(ticket);
+        return true;
+    }
+
+    @Override
+    public List<TicketResponse> getRedeemedTickets() {
+        List<Ticket> redeemedTickets = ticketRepository.findByStatus(TICKET_STATUS.REDEEMED);
+        return redeemedTickets.stream()
                 .map(this::convertToTicketResponse)
                 .collect(Collectors.toList());
     }
@@ -178,8 +197,7 @@ public class TicketServiceImpl implements TicketService {
                         HttpStatus.BAD_REQUEST, "Showtime not found with id " + ticketRequest.getShowTimeId()));
 
         Ticket ticket = Ticket.builder()
-                .seatNumber(ticketRequest.getSeatNumber())
-                .price(ticketRequest.getPrice())
+                .seatNumber(ticketRequest.getSeatNumbers())
                 .status(ticketRequest.getStatus())
                 .user(user)
                 .showTime(showTime)
@@ -195,11 +213,8 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Ticket not found with id " + ticketId));
 
-        if (ticketRequest.getPrice() != null && !ticketRequest.getPrice().isNaN()) {
-            existingTicket.setPrice(ticketRequest.getPrice());
-        }
-        if (ticketRequest.getSeatNumber() != null && !ticketRequest.getSeatNumber().isEmpty()) {
-            existingTicket.setSeatNumber(ticketRequest.getSeatNumber());
+        if (ticketRequest.getSeatNumbers() != null && !ticketRequest.getSeatNumbers().isEmpty()) {
+            existingTicket.setSeatNumber(ticketRequest.getSeatNumbers());
         }
         if (ticketRequest.getStatus() != null) {
             existingTicket.setStatus(ticketRequest.getStatus());
@@ -226,12 +241,16 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private TicketResponse convertToTicketResponse(Ticket ticket) {
+        UserResponse userResponse = UserResponse.builder()
+                .name(ticket.getUser().getName()).build();
+
         return TicketResponse.builder()
                 .id(ticket.getId())
-                .price(ticket.getPrice())
-                .seatNumber(ticket.getSeatNumber())
+                .price(ticket.getShowTime().getPrice())
+                .seatNumbers(ticket.getSeatNumber())
                 .status(ticket.getStatus())
                 .qrcodeUrl(ticket.getQrcodeUrl())
+                .user(userResponse)
                 .userId(ticket.getUser().getId())
                 .showTimeId(ticket.getShowTime().getId())
                 .showTime(showtimeConverter.convertToShowTimeResponse(ticket.getShowTime()))

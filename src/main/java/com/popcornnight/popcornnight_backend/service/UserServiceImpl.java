@@ -58,6 +58,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
+        if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
+
         User user = User.builder()
                 .isAnonymous(userRequest.getIsAnonymous())
                 .name(userRequest.getName())

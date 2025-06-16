@@ -24,6 +24,7 @@ public class ShowtimeConverter {
                 .timestamp(showTime.getTimestamp())
                 .isPublished(showTime.getIsPublished())
                 .seatStatusGrid(showTime.getSeatStatusGrid())
+                .price(showTime.getPrice())
                 .movie(movieConverter.convertToMovieResponse(showTime.getMovie()))
                 .hall(hallConverter.convertToHallResponse(showTime.getHall()))
                 .build();

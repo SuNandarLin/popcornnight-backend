@@ -18,6 +18,7 @@ public class ShowTimeRequest {
     private Long timestamp;
     private Boolean isPublished;
     private List<List<Integer>> seatStatusGrid;
+    private Float price;
     private Long movieId;
     private Long hallId;
 }

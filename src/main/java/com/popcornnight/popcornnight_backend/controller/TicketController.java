@@ -1,5 +1,6 @@
 package com.popcornnight.popcornnight_backend.controller;
 
+import com.popcornnight.popcornnight_backend.dto.ticket.TicketQRcodeInfo;
 import com.popcornnight.popcornnight_backend.dto.ticket.TicketRequest;
 import com.popcornnight.popcornnight_backend.dto.ticket.TicketResponse;
 import com.popcornnight.popcornnight_backend.service.TicketService;
@@ -20,8 +21,13 @@ public class TicketController {
 
     @PostMapping("/issue")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<TicketResponse> issueTicket(@RequestBody List<TicketRequest> ticketRequests) {
-        return ticketService.issueTicket(ticketRequests);
+    public TicketResponse issueTicket(@RequestBody TicketRequest ticketRequest) {
+        return ticketService.issueTicket(ticketRequest);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<TicketResponse> getTicketsByUserId(@PathVariable Long userId) {
+        return ticketService.getTicketsByUserId(userId);
     }
 
     @GetMapping
@@ -32,6 +38,16 @@ public class TicketController {
     @GetMapping("/{id}")
     public TicketResponse getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id);
+    }
+
+    @PutMapping("/verify")
+    public boolean verifyAndRedeemTicket(@RequestBody TicketQRcodeInfo ticketQRcodeInfo) {
+        return ticketService.verifyAndRedeemTicket(ticketQRcodeInfo);
+    }
+
+    @GetMapping("/redeemed")
+    public List<TicketResponse> getRedeemedTickets() {
+        return ticketService.getRedeemedTickets();
     }
 
     @PostMapping

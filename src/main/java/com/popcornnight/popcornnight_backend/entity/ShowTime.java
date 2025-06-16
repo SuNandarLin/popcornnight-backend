@@ -42,6 +42,9 @@ public class ShowTime {
     @Column(name = "seatstatus_grid", columnDefinition = "json")
     private List<List<Integer>> seatStatusGrid; // e.g., [[0, 0], [0, 0]]
 
+    @Column(name = "price")
+    private Float price;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id", nullable = false, referencedColumnName = "id")
     private Movie movie;
